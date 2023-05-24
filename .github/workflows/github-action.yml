@@ -26,4 +26,4 @@ jobs:
         ssh-keyscan -H $SSH_ADDRESS  >> ~/.ssh/known_hosts
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh ubuntu@$SSH_ADDRESS "cd /var/www/html/github-action-demo; git pull origin dev"
+        ssh ubuntu@$SSH_ADDRESS "cd /var/www/html; mkdir -p github-action-demo"
