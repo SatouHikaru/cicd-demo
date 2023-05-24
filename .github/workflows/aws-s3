@@ -1,0 +1,37 @@
+name: S3 Build
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16'
+
+    - name: Yarn Install
+      run: |
+        npm install
+
+    - name: Production Build
+      env:
+       DOT_ENV: ${{ secrets.DOT_ENV }} # .env
+      run: |
+        echo "$DOT_ENV" > .env
+        npm run build
+
+    - name: Deploy to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl private --exclude '.git/*' --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_PRODUCTION_BUCKET }} # bucket name
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: "ap-northeast-1"
+        SOURCE_DIR: "build"
